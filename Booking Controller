@@ -1,0 +1,66 @@
+package com.sauvir.RentEase.Controllers;
+
+import com.sauvir.RentEase.model.Booking;
+import com.sauvir.RentEase.model.Property;
+import com.sauvir.RentEase.model.Tenant;
+import com.sauvir.RentEase.repository.PropertyRepository;
+import com.sauvir.RentEase.repository.TenantRepository;
+import com.sauvir.RentEase.service.BookingService;
+import com.sauvir.RentEase.service.PropertyService;
+import com.sauvir.RentEase.service.TenantService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api")
+@CrossOrigin(origins = "*")
+public class BookingController {
+
+    @Autowired
+    private BookingService serviceBooking;
+
+    @GetMapping("/bookings/property/{propertyId}/tenant/{tenantId}")
+    public ResponseEntity<Booking> getBookingByTenantAndPropertyId(@PathVariable int propertyId,@PathVariable int tenantId){
+            Booking booking=serviceBooking.getBookingByBothId(propertyId,tenantId);
+            return new ResponseEntity<>(booking, HttpStatus.OK);
+    }
+
+    @GetMapping("/bookings/{id}")
+    public ResponseEntity<Booking> getBookingByBookingId(@PathVariable int id){
+        Booking booking=serviceBooking.getBookingById(id);
+        return new ResponseEntity<>(booking,HttpStatus.OK);
+    }
+
+    @GetMapping("/bookings/property/{propertyId}")
+    public ResponseEntity<List<Booking>> getBookingsBypropertyId(@PathVariable int propertyId){
+       return new ResponseEntity<>(serviceBooking.getBookingsByPropertyId(propertyId),HttpStatus.OK);
+    }
+
+    @GetMapping("/bookings/tenants/{tenantsId}")
+    public ResponseEntity<List<Booking>> getBookingsByTenantId(@PathVariable int tenantsId){
+        return new ResponseEntity<>(serviceBooking.getBookingsByTenantId(tenantsId),HttpStatus.OK);
+    }
+
+    @PostMapping("/bookings/property/{propertyId}/tenant/{tenantId}")
+    public ResponseEntity<Booking> createBooking(@PathVariable int propertyId,@PathVariable int tenantId,@RequestBody Booking booking){
+        Booking booking1=serviceBooking.createBooking(propertyId,tenantId,booking);
+        return new ResponseEntity<>(booking1,HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/bookings/{id}")
+    public ResponseEntity<Void> DeleteBooking(@PathVariable int id){
+        serviceBooking.DeleteBooking(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/bookings/{id}/status")
+    public ResponseEntity<Booking> updateBookingStatus(@PathVariable int id , @RequestParam String status){
+        Booking booking=serviceBooking.updateBookingStatus(id,status);
+        return new ResponseEntity<>(booking,HttpStatus.OK);
+    }
+}
